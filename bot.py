@@ -1,9 +1,6 @@
 import os
 import certifi
-
-# Set the SSL_CERT_FILE environment variable
-os.environ["SSL_CERT_FILE"] = certifi.where()
-
+import asyncio
 import discord
 from discord.ext import commands
 from discord import Intents
@@ -13,6 +10,9 @@ from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
 
 load_dotenv()
+
+os.environ["SSL_CERT_FILE"] = certifi.where()
+
 
 # Initialize Firebase
 cred = credentials.Certificate("secrets/serviceAccountKey.json")
@@ -26,7 +26,7 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
 # Define Intents
 intents = Intents.default()
-intents.messages = True  # For messages in servers
+intents.messages = True
 intents.guilds = True
 intents.message_content = True
 
@@ -37,9 +37,21 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 URL_REGEX = r"(https?://[^\s]+)"
 
 
-async def save_song_link(song_link):
+def save_song_link(song_link):
     doc_ref = db.collection("song_links").document()
-    await doc_ref.set({"url": song_link})
+    try:
+        doc_ref.set({"url": song_link})
+        return True  # Success
+    except Exception as e:
+        print(f"Error saving song link: {e}")
+        return False  # Error occurred
+
+
+def on_save_complete(future):
+    if future.exception() is not None:
+        print(f"Error saving song link: {future.exception()}")
+    else:
+        print("Song link saved successfully")
 
 
 @bot.event
@@ -58,7 +70,7 @@ async def on_message(message):
         if urls:
             for url in urls:
                 print(f"Song Link Detected: {url}")
-                await save_song_link(url)
+                save_song_link(url)  # Call the function without 'await'
                 await message.channel.send(f"Song link saved: {url}")
 
     await bot.process_commands(message)
