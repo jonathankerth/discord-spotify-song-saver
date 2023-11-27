@@ -1,46 +1,59 @@
+import os
+import certifi
+
+# Set the SSL_CERT_FILE environment variable
+os.environ["SSL_CERT_FILE"] = certifi.where()
+
 import discord
 from discord.ext import commands
+from discord import Intents
 import re
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore
+from dotenv import load_dotenv
 
-# Use a service account
-cred = credentials.Certificate('path/to/your/serviceAccountKey.json')
+load_dotenv()
+
+# Initialize Firebase
+cred = credentials.Certificate("secrets/serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-TOKEN = 'YOUR_BOT_TOKEN'
-GUILD_ID = 1234
-CHANNEL_ID = 1234
+TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+GUILD_ID = int(os.getenv("GUILD_ID"))
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
-bot = commands.Bot(command_prefix='!')
+# Define Intents
+intents = Intents.default()
+intents.messages = True  # For messages in servers
+intents.guilds = True
+intents.message_content = True
+
+# Initialize Bot with Intents
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Regex pattern to match URLs
 URL_REGEX = r"(https?://[^\s]+)"
 
-# Function to save song link to Firestore
+
 async def save_song_link(song_link):
-    doc_ref = db.collection('song_links').document()
-    doc_ref.set({
-        'url': song_link
-    })
+    doc_ref = db.collection("song_links").document()
+    await doc_ref.set({"url": song_link})
+
 
 @bot.event
 async def on_ready():
     guild = discord.utils.get(bot.guilds, id=GUILD_ID)
     print(f"Connected to {guild.name}")
 
+
 @bot.event
 async def on_message(message):
-    # Ensure the bot does not reply to itself
     if message.author == bot.user:
         return
 
-    # Check if the message is in the designated channel
     if message.channel.id == CHANNEL_ID:
-        # Check if the message contains a URL using regex
         urls = re.findall(URL_REGEX, message.content)
         if urls:
             for url in urls:
@@ -48,17 +61,17 @@ async def on_message(message):
                 await save_song_link(url)
                 await message.channel.send(f"Song link saved: {url}")
 
-    # Process commands
     await bot.process_commands(message)
 
-# Command to retrieve saved song links
-@bot.command(name='songs', help='Displays the saved song links.')
+
+@bot.command(name="songs", help="Displays the saved song links.")
 async def on_songs_command(ctx):
-    song_links = db.collection('song_links').stream()
-    songs = [song_link.to_dict()['url'] for song_link in song_links]
+    song_links = db.collection("song_links").stream()
+    songs = [song_link.to_dict()["url"] for song_link in song_links]
     if songs:
         await ctx.send("\n".join(songs))
     else:
         await ctx.send("No song links have been saved yet.")
+
 
 bot.run(TOKEN)
