@@ -38,11 +38,15 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # Regex pattern to match URLs
 URL_REGEX = r"(https?://[^\s]+)"
 
+last_saved_song_link_id = None
+
 
 def save_song_link(song_link):
+    global last_saved_song_link_id
     doc_ref = db.collection("song_links").document()
     try:
         doc_ref.set({"url": song_link})
+        last_saved_song_link_id = doc_ref.id  # Update the last saved song link ID
         return True  # Success
     except Exception as e:
         print(f"Error saving song link: {e}")
@@ -73,9 +77,23 @@ async def on_message(message):
             for url in urls:
                 print(f"Song Link Detected: {url}")
                 save_song_link(url)  # Call the function without 'await'
-                await message.channel.send("Song link saved successfully")
+                await message.channel.send(f"Song link saved successfully")
 
     await bot.process_commands(message)
+
+
+@bot.command(name="delete_last", help="Deletes the last posted song link.")
+async def on_delete_last_command(ctx):
+    global last_saved_song_link_id
+    if last_saved_song_link_id:
+        try:
+            db.collection("song_links").document(last_saved_song_link_id).delete()
+            await ctx.send("Last song link deleted successfully.")
+            last_saved_song_link_id = None
+        except Exception as e:
+            await ctx.send(f"Error deleting song link: {e}")
+    else:
+        await ctx.send("No song link available to delete.")
 
 
 @bot.command(name="songs", help="Displays the saved song links.")
