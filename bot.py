@@ -73,7 +73,7 @@ async def on_message(message):
             for url in urls:
                 print(f"Song Link Detected: {url}")
                 save_song_link(url)  # Call the function without 'await'
-                await message.channel.send(f"Song link saved: {url}")
+                await message.channel.send("Song link saved successfully")
 
     await bot.process_commands(message)
 
