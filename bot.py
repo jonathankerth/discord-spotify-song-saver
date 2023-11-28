@@ -15,7 +15,8 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 
 
 # Initialize Firebase
-cred = credentials.Certificate("secrets/serviceAccountKey.json")
+firebase_service_account = os.getenv("FIREBASE_SERVICE_ACCOUNT")
+cred = credentials.Certificate(json.loads(firebase_service_account))
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
