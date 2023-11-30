@@ -80,7 +80,7 @@ def get_playlist_tracks(playlist_id):
         return set()
 
 
-def add_songs_to_playlist(playlist_id, song_links):
+def add_songs_to_playlist(user_id, playlist_id, song_links):
     try:
         current_tracks = get_playlist_tracks(playlist_id)
         new_songs = [
