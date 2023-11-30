@@ -37,6 +37,7 @@ try:
             client_secret=SPOTIFY_CLIENT_SECRET,
             redirect_uri=SPOTIFY_REDIRECT_URI,
             scope=SPOTIFY_SCOPE,
+            cache_path="/tmp/.spotipyoauthcache",
         )
     )
     user_id = sp.current_user()["id"]
