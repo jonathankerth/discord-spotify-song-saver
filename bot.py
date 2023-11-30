@@ -66,18 +66,21 @@ async def on_ready():
     print(f"Connected to {guild.name}")
 
 
+URL_REGEX = r"(https://open\.spotify\.com/[^\s]+)"
+
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
     if message.channel.id == CHANNEL_ID:
-        urls = re.findall(URL_REGEX, message.content)
-        if urls:
-            for url in urls:
-                print(f"Song Link Detected: {url}")
+        spotify_urls = re.findall(URL_REGEX, message.content)
+        if spotify_urls:
+            for url in spotify_urls:
+                print(f"Spotify Link Detected: {url}")
                 save_song_link(url)  # Call the function without 'await'
-                await message.channel.send(f"Song link saved successfully")
+                await message.channel.send(f"Spotify link saved successfully")
 
     await bot.process_commands(message)
 
