@@ -22,19 +22,17 @@ except Exception as e:
     print(f"Failed to initialize Firebase: {e}")
     exit(1)
 
-    # Initialize Spotify Client using Client Credentials Flow
-
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-
 try:
+    # Initialize Spotify Client using Client Credentials Flow
+    SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+    SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+
     sp = spotipy.Spotify(
-        auth_manager=SpotifyClientCredentials(
+        auth_manager=SpotifyClientCredentials(  # Use SpotifyClientCredentials
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
         )
     )
-    user_id = sp.current_user()["id"]  # Move this line inside the try block
     print("Spotify client initialized successfully.")
 except Exception as e:
     print(f"Failed to initialize Spotify client: {e}")
