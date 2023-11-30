@@ -27,7 +27,10 @@ playlist_url = (
 parts = playlist_url.split("/")
 user_id = parts[4]
 
-SPOTIFY_REDIRECT_URI = "https://your-heroku-app-name.herokuapp.com/callback"
+SPOTIFY_REDIRECT_URI = (
+    "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
+)
+
 
 try:
     # Initialize Spotify Client using SpotifyOAuth
