@@ -5,11 +5,16 @@ from spotipy.oauth2 import SpotifyOAuth
 import firebase_admin
 from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
-
+from flask import Flask
 
 # Load environment variables
 load_dotenv()
 
+app = Flask(__name__)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 try:
     # Initialize Firebase
