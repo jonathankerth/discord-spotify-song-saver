@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-
 try:
     # Initialize Firebase
     firebase_service_account = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
@@ -23,24 +22,16 @@ except Exception as e:
     exit(1)
 
 try:
-    # Initialize Spotify Client
+    # Initialize Spotify Client using Client Credentials Flow
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-    SPOTIFY_REDIRECT_URI = (
-        "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
-    )
-    SPOTIFY_SCOPE = "playlist-modify-public"
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyOAuth(
+        auth_manager=SpotifyClientCredentials(
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
-            redirect_uri=SPOTIFY_REDIRECT_URI,
-            scope=SPOTIFY_SCOPE,
-            cache_path="/tmp/.spotipyoauthcache",
         )
     )
-    user_id = sp.current_user()["id"]
     print("Spotify client initialized successfully.")
 except Exception as e:
     print(f"Failed to initialize Spotify client: {e}")
