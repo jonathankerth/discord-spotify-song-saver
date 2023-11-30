@@ -27,26 +27,28 @@ playlist_url = (
 parts = playlist_url.split("/")
 user_id = parts[4]
 
+SPOTIFY_REDIRECT_URI = (
+    "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
+)
+
 try:
     # Initialize Spotify Client using Client Credentials Flow
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+    SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyOAuth(
+        auth_manager=SpotifyClientCredentials(
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
             redirect_uri=SPOTIFY_REDIRECT_URI,
-            scope="playlist-modify-public",  # Adjust the scope as needed
+            scope="playlist-modify-public",
         )
     )
     print("Spotify client initialized successfully.")
 except Exception as e:
     print(f"Failed to initialize Spotify client: {e}")
     exit(1)
-
-user_id = sp.current_user()["id"]
-print(f"Authenticated user's ID: {user_id}")
 
 
 def fetch_song_links():
