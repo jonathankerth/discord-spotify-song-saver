@@ -1,6 +1,7 @@
 import os
 import json
 import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 from spotipy.oauth2 import SpotifyClientCredentials
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -20,14 +21,29 @@ except Exception as e:
     print(f"Failed to initialize Firebase: {e}")
     exit(1)
 
-# Initialize Spotify Client using SpotifyClientCredentials
+playlist_url = (
+    "https://open.spotify.com/playlist/2vFjMb9dw5WbIrrr3RUwXY?si=e757825a2a5a4074"
+)
+parts = playlist_url.split("/")
+user_id = parts[4]
+
+SPOTIFY_REDIRECT_URI = (
+    "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
+)
+
+
 try:
+    # Initialize Spotify Client using SpotifyOAuth
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+    SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyClientCredentials(
-            client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET
+        auth_manager=SpotifyOAuth(
+            client_id=SPOTIFY_CLIENT_ID,
+            client_secret=SPOTIFY_CLIENT_SECRET,
+            redirect_uri=SPOTIFY_REDIRECT_URI,
+            scope="playlist-modify-public",
         )
     )
     print("Spotify client initialized successfully.")
