@@ -2,6 +2,7 @@ import os
 import json
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials
 import firebase_admin
 from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
@@ -27,7 +28,7 @@ try:
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyClientCredentials(
+        auth_manager=SpotifyClientCredentials(  # Use SpotifyClientCredentials
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
         )
