@@ -22,20 +22,13 @@ except Exception as e:
     print(f"Failed to initialize Firebase: {e}")
     exit(1)
 
-
-playlist_url = (
-    "https://open.spotify.com/playlist/2vFjMb9dw5WbIrrr3RUwXY?si=e757825a2a5a4074"
-)
-parts = playlist_url.split("/")
-user_id = parts[4]
-
 try:
     # Initialize Spotify Client using Client Credentials Flow
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyClientCredentials(
+        auth_manager=SpotifyClientCredentials(  # Use SpotifyClientCredentials
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
         )
@@ -111,13 +104,5 @@ try:
     song_links = fetch_song_links()
     print(f"Fetched {len(song_links)} song links from Firebase.")
     add_songs_to_playlist(target_playlist_id, song_links)
-except Exception as e:
-    print(f"An error occurred during execution: {e}")
-try:
-    song_links = fetch_song_links()
-    print(f"Fetched {len(song_links)} song links from Firebase.")
-    add_songs_to_playlist(
-        user_id, target_playlist_id, song_links
-    )  # Pass user_id as the first argument
 except Exception as e:
     print(f"An error occurred during execution: {e}")
