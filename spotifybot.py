@@ -33,20 +33,15 @@ try:
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
     sp = spotipy.Spotify(
-        auth_manager=SpotifyOAuth(
+        auth_manager=SpotifyClientCredentials(
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
-            redirect_uri=SPOTIFY_REDIRECT_URI,
-            scope="playlist-modify-public",  # Adjust the scope as needed
         )
     )
     print("Spotify client initialized successfully.")
 except Exception as e:
     print(f"Failed to initialize Spotify client: {e}")
     exit(1)
-
-user_id = sp.current_user()["id"]
-print(f"Authenticated user's ID: {user_id}")
 
 
 def fetch_song_links():
