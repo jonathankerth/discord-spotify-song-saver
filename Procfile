@@ -1,2 +1,2 @@
-worker: python3 bot.py
-worker: python3 spotifybot.py
+web: gunicorn app:app
+worker: python3 combined_bot.py
