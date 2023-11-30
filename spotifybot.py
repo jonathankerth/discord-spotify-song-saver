@@ -26,11 +26,17 @@ try:
     # Initialize Spotify Client
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+    SPOTIFY_REDIRECT_URI = (
+        "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
+    )
+    SPOTIFY_SCOPE = "playlist-modify-public"
 
     sp = spotipy.Spotify(
         auth_manager=SpotifyOAuth(
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
+            redirect_uri=SPOTIFY_REDIRECT_URI,
+            scope=SPOTIFY_SCOPE,
         )
     )
     user_id = sp.current_user()["id"]
