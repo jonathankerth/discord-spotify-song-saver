@@ -7,6 +7,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
 
+
 # Load environment variables
 load_dotenv()
 
@@ -20,6 +21,7 @@ try:
 except Exception as e:
     print(f"Failed to initialize Firebase: {e}")
     exit(1)
+
 
 playlist_url = (
     "https://open.spotify.com/playlist/2vFjMb9dw5WbIrrr3RUwXY?si=e757825a2a5a4074"
@@ -80,9 +82,7 @@ def get_playlist_tracks(playlist_id):
 
 def add_songs_to_playlist(user_id, target_playlist_id, song_links):
     try:
-        current_tracks = get_playlist_tracks(
-            target_playlist_id
-        )  # Use target_playlist_id here
+        current_tracks = get_playlist_tracks(playlist_id)
         new_songs = [
             (doc_id, link)
             for doc_id, link in song_links
@@ -95,9 +95,7 @@ def add_songs_to_playlist(user_id, target_playlist_id, song_links):
 
         track_ids = extract_track_ids(new_songs)
         if track_ids:
-            sp.user_playlist_add_tracks(
-                user_id, target_playlist_id, track_ids
-            )  # Use target_playlist_id here
+            sp.user_playlist_add_tracks(user_id, playlist_id, track_ids)
             print("New tracks added to the playlist successfully.")
         else:
             print("No valid track IDs found.")
@@ -109,6 +107,12 @@ def add_songs_to_playlist(user_id, target_playlist_id, song_links):
 target_playlist_id = "2vFjMb9dw5WbIrrr3RUwXY"
 
 # Execute the Function
+try:
+    song_links = fetch_song_links()
+    print(f"Fetched {len(song_links)} song links from Firebase.")
+    add_songs_to_playlist(target_playlist_id, song_links)
+except Exception as e:
+    print(f"An error occurred during execution: {e}")
 try:
     song_links = fetch_song_links()
     print(f"Fetched {len(song_links)} song links from Firebase.")
