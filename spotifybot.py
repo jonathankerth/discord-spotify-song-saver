@@ -20,8 +20,16 @@ SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 SPOTIFY_REDIRECT_URI = "http://localhost:8888/callback"
 
+if os.getenv("PRODUCTION"):
+    SPOTIFY_REDIRECT_URI = (
+        "https://discord-song-scraper-ac3a436a01d8.herokuapp.com/callback"
+    )
+else:
+    SPOTIFY_REDIRECT_URI = "http://localhost:8888/callback"
+
 # Spotify Scope for Playlist Modification
 SPOTIFY_SCOPE = "playlist-modify-public"
+
 
 # Initialize Spotify Client
 sp = spotipy.Spotify(
@@ -40,27 +48,38 @@ user_id = sp.current_user()["id"]
 # Fetch Song Links from Firebase
 def fetch_song_links():
     song_links = db.collection("song_links").stream()
-    return [(song_link.id, song_link.to_dict()["url"]) for song_link in song_links]
+    return [
+        (song_link.id, song_link.to_dict()["url"])
+        for song_link in song_links
+        if "url" in song_link.to_dict()
+    ]
 
 
 # Extract Track IDs from URLs
 def extract_track_ids(song_links):
     track_ids = []
     for _, link in song_links:
-        parts = link.split("/")
-        if len(parts) > 0 and parts[-1]:
-            track_id = parts[-1].split("?")[0]
-            track_ids.append(track_id)
-        else:
-            print(f"Invalid Spotify URL: {link}")
+        if "open.spotify.com/track/" in link:
+            parts = link.split("/")
+            track_id_part = parts[-1].split("?")[
+                0
+            ]  # Extract the track ID part before any query parameters
+            track_id = track_id_part.split("#")[0]  # Remove fragment if any
+            track_ids.append((_, track_id))
     return track_ids
 
 
 # Get Current Playlist Tracks
 def get_playlist_tracks(playlist_id):
+    tracks = set()
     results = sp.playlist_items(playlist_id)
-    tracks = [item["track"]["id"] for item in results["items"]]
-    return set(tracks)
+    tracks.update([item["track"]["id"] for item in results["items"]])
+
+    while results["next"]:
+        results = sp.next(results)
+        tracks.update([item["track"]["id"] for item in results["items"]])
+
+    return tracks
 
 
 # Add Songs to Specific Playlist
@@ -77,14 +96,11 @@ def add_songs_to_playlist(playlist_id, song_links):
         return
 
     track_ids = extract_track_ids(new_songs)
-    if track_ids:
+    for track_id in track_ids:
         try:
-            sp.user_playlist_add_tracks(user_id, playlist_id, track_ids)
-            print("New tracks added to the playlist successfully.")
+            sp.user_playlist_add_tracks(user_id, playlist_id, [track_id])
         except spotipy.exceptions.SpotifyException as e:
-            print(f"An error occurred: {e}")
-    else:
-        print("No valid track IDs found.")
+            print(f"An error occurred adding track {track_id}: {e}")
 
 
 # Playlist ID from the given URL
