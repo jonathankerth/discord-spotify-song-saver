@@ -36,7 +36,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Regex pattern to match URLs
-URL_REGEX = r"(https?://[^\s]+)"
+URL_REGEX = r"https://open\.spotify\.com/track/[a-zA-Z0-9]+"
 
 last_saved_song_link_id = None
 
@@ -75,12 +75,12 @@ async def on_message(message):
         return
 
     if message.channel.id == CHANNEL_ID:
-        spotify_urls = re.findall(URL_REGEX, message.content)
-        if spotify_urls:
-            for url in spotify_urls:
-                print(f"Spotify Link Detected: {url}")
+        spotify_track_urls = re.findall(URL_REGEX, message.content)
+        if spotify_track_urls:
+            for url in spotify_track_urls:
+                print(f"Spotify Track Link Detected: {url}")
                 save_song_link(url)  # Call the function without 'await'
-                await message.channel.send(f"Spotify link saved successfully")
+                await message.channel.send(f"Spotify track link saved successfully")
 
     await bot.process_commands(message)
 
