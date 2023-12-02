@@ -1,8 +1,8 @@
-# README for Discord Spotify Song Saver
+# Discord & Spotify Song Saver
 
 ## Overview
 
-This project, hosted on GitHub at [jonathankerth/discord-spotify-song-saver](https://github.com/jonathankerth/discord-spotify-song-saver), consists of a Discord bot that saves Spotify song links posted in a Discord channel to a Firebase database. Additionally, it includes a Spotify bot that retrieves these links from Firebase and adds them to a specified Spotify playlist.
+The Discord Spotify Song Saver project emerged from brainstorming with friends about building something beneficial and enjoyable for our group. It captures songs shared in Discord and assembles them into an ever-updating Spotify playlist, mirroring our collective musical preferences. This endeavor not only elevates our music-sharing experience but also serves as a platform for expanding my knowledge and honing my technical skills, making it a rewarding and educational venture.
 
 ## Features
 
