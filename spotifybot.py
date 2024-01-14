@@ -56,16 +56,16 @@ def fetch_song_links():
 
 
 # Extract Track IDs from URLs
+# Extract Track IDs from URLs
 def extract_track_ids(song_links):
     track_ids = []
     for _, link in song_links:
         if "open.spotify.com/track/" in link:
             parts = link.split("/")
-            track_id_part = parts[-1].split("?")[
+            track_id = parts[-1].split("?")[
                 0
-            ]  # Extract the track ID part before any query parameters
-            track_id = track_id_part.split("#")[0]  # Remove fragment if any
-            track_ids.append((_, track_id))
+            ]  # Extract the track ID before any query parameters
+            track_ids.append(track_id)
     return track_ids
 
 
